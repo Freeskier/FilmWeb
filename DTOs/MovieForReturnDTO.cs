@@ -14,5 +14,6 @@ namespace Backend.DTOs
         public string DescriptionLong {get; set;}
         public string ImageURL {get; set;}
         public int DurationTimeMinutes {get; set;}
+        public float Rating {get; set;}
     }
 }

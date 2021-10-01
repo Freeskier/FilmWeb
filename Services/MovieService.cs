@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Backend.DTOs;
@@ -13,8 +14,10 @@ namespace Backend.Services
         private readonly IMovieRepository _movieRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public MovieService(IMovieRepository movieRepository, IUserRepository userRepository, IMapper mapper)
+        private readonly IRatingRepository _ratingRepository;
+        public MovieService(IMovieRepository movieRepository, IUserRepository userRepository, IRatingRepository ratingRepository, IMapper mapper)
         {
+            _ratingRepository = ratingRepository;
             _mapper = mapper;
             _movieRepository = movieRepository;
             _userRepository = userRepository;
@@ -29,15 +32,22 @@ namespace Backend.Services
 
         public async Task<IEnumerable<MovieForReturnDTO>> GetAllMovies()
         {
-            var movies = await _movieRepository.GetAllAsync();
+            var movies = await _movieRepository.GetAllMovies();
             var mapped = _mapper.Map<IEnumerable<MovieForReturnDTO>>(movies);
+
+            foreach(var m in movies)
+            {
+                var map = mapped.FirstOrDefault(x => x.ID == m.ID);
+                CalculateRating(m, ref map);
+            }
             return mapped;
         }
 
         public async Task<MovieForReturnDTO> GetMovie(int id)
         {
-            var movie = await _movieRepository.GetAsync(id);
+            var movie = await _movieRepository.GetMovie(id);
             var mapped = _mapper.Map<MovieForReturnDTO>(movie);
+            CalculateRating(movie, ref mapped);
             return mapped;
         }
 
@@ -45,6 +55,11 @@ namespace Backend.Services
         {
             var movie = await _movieRepository.GetSeen(userID);
             var mapped = _mapper.Map<IEnumerable<MovieForReturnDTO>>(movie);
+            foreach(var m in movie)
+            {
+                var map = mapped.FirstOrDefault(x => x.ID == m.ID);
+                CalculateRating(m, ref map);
+            }
             return mapped;
 
         }
@@ -57,6 +72,15 @@ namespace Backend.Services
                 throw new Exception("Movie is already in list.");
             user.SeenMovies.Add(movie);
             await _userRepository.SaveAsync();
+        }
+
+        private void CalculateRating(Movie movie, ref MovieForReturnDTO forReturnDTO)
+        {
+            if(movie.Ratings!= null)
+            {
+                float rating = (float) movie.Ratings.Sum(x => x.Stars) / (float)movie.Ratings.Count;
+                forReturnDTO.Rating = rating;
+            }
         }
     }
 }
