@@ -28,10 +28,11 @@ namespace Backend.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveRating(int id)
+        [HttpDelete("{movieID}")]
+        public async Task<IActionResult> RemoveRating(int movieID)
         {
-            await _service.RemoveRating(id);
+            var userID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            await _service.RemoveRating(movieID, userID);
             return Ok();
         }
 

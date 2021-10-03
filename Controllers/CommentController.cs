@@ -36,15 +36,16 @@ namespace Backend.Controllers
 
 
         [HttpGet("getByMovie/{id}")]
-        public async Task<ActionResult<IEnumerable<RatingForReturnDTO>>> GetCommentsByMovie(int id)
+        public async Task<ActionResult<IEnumerable<CommentForReturnDTO>>> GetCommentsByMovie(int id)
         {
             return Ok(await _service.GetMovieComments(id));
         }
 
-        [HttpGet("getByUser/{id}")]
-        public async Task<ActionResult<IEnumerable<RatingForReturnDTO>>> GetCommentsByUser(int id)
+        [HttpGet("getByUser")]
+        public async Task<ActionResult<IEnumerable<CommentForReturnDTO>>> GetCommentsByUser()
         {
-            return Ok(await _service.GetUserComments(id));
+            var userID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(await _service.GetUserComments(userID));
         }
     }
 }

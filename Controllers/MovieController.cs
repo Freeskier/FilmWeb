@@ -36,6 +36,14 @@ namespace Backend.Controllers
             return Ok();
         }
 
+        [HttpDelete("deleteSeen/{movieID}")]
+        public async Task<IActionResult> DeleteSeenMovie(int movieID)
+        {
+            var userID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            await _service.DeleteSeen(movieID, userID);
+            return Ok();
+        }
+
         [HttpGet("getAll")]
         public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
         {
@@ -43,9 +51,10 @@ namespace Backend.Controllers
         }
 
         [HttpGet("get/{movieID}")]
-        public async Task<ActionResult<Movie>> GetAllMovies(int movieID)
+        public async Task<ActionResult<Movie>> GetMovie(int movieID)
         {
-            return Ok(await _service.GetMovie(movieID));
+            var userID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(await _service.GetMovie(movieID, userID));
         }
 
         [HttpGet("getSeen")]
@@ -53,6 +62,13 @@ namespace Backend.Controllers
         {
             var userID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(await _service.GetSeen(userID));
+        }
+
+        [HttpGet("isSeen/{movieID}")]
+        public async Task<ActionResult<bool>> IsSeen(int movieID)
+        {
+            var userID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(await _service.IsSeen(movieID, userID));
         }
     }
 }

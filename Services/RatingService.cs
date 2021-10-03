@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -11,12 +12,13 @@ namespace Backend.Services
     public class RatingService : IRatingService
     {
         private readonly IRatingRepository _ratingRepository;
+        private readonly IMovieRepository _movieRepository;
         private readonly IMapper _mapper;
-        public RatingService(IRatingRepository ratingRepository, IMapper mapper)
+        public RatingService(IRatingRepository ratingRepository, IMovieRepository movieRepository, IMapper mapper)
         {
             _mapper = mapper;
             _ratingRepository = ratingRepository;
-
+            _movieRepository = movieRepository;
         }
         public async Task AddRating(RatingForAddDTO rating, int userID)
         {
@@ -35,9 +37,10 @@ namespace Backend.Services
             return mapped;
         }
 
-        public async Task RemoveRating(int ratingID)
+        public async Task RemoveRating(int movieID, int userID)
         {
-            var rating = await _ratingRepository.GetAsync(ratingID);
+            var movie = await _movieRepository.GetMovie(movieID);
+            var rating = movie.Ratings.FirstOrDefault(x => x.UserID == userID);
             await _ratingRepository.RemoveAsync(rating);
             await _ratingRepository.SaveAsync();
         }

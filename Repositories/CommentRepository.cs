@@ -17,13 +17,13 @@ namespace Backend.Repositories
 
         public async Task<IEnumerable<Comment>> GetCommentsForMovie(int movieID)
         {
-            return await _context.Comments.Where(x => x.MovieID == movieID)
+            return await _context.Comments.Where(x => x.MovieID == movieID).Include(x => x.User)
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<Comment>> GetCommentsForUser(int userID)
         {
-            return await _context.Comments.Where(x => x.UserID == userID)
+            return await _context.Comments.Where(x => x.UserID == userID).Include(x => x.User)
                 .ToListAsync();
         }
     }

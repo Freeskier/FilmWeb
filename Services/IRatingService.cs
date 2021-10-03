@@ -8,7 +8,7 @@ namespace Backend.Services
     public interface IRatingService
     {
         Task AddRating(RatingForAddDTO rating, int userID);
-        Task RemoveRating(int ratingID);
+        Task RemoveRating(int movieID, int userID);
         Task<IEnumerable<RatingForReturnDTO>> GetMovieRatings(int movieID);
         
     }
